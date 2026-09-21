@@ -1,0 +1,49 @@
+services:
+
+  primary:
+    image: postgres:18
+    container_name: db_primary
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=my_app_db
+      - POSTGRES_USER=aglaya
+      - POSTGRES_PASSWORD=aglaya_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data/primary:/var/lib/postgresql
+      - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=5
+      -c wal_keep_size=1024MB
+      -c shared_buffers=256MB
+      
+  replica:
+    image: postgres:18
+    container_name: db_replica
+    restart: unless-stopped
+    depends_on:
+      - primary
+    entrypoint: ["/bin/bash", "/tmp/entrypoint.sh"]
+    environment:
+      - PGDATA=/var/lib/postgresql/18/docker
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db_data/replica:/var/lib/postgresql
+      - ./db_init/entrypoint.sh:/tmp/entrypoint.sh:ro
+
+  my_app:
+    build: .
+    container_name: my_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - primary
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://primary:5432/my_app_db
+      - SPRING_DATASOURCE_USERNAME=aglaya
+      - SPRING_DATASOURCE_PASSWORD=aglaya_password
