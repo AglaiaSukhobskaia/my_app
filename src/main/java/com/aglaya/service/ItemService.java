@@ -26,7 +26,7 @@ public class ItemService {
     }
 
     public ItemRs getItem(Integer id) {
-        var item = itemRepository.getReferenceById(id);
+        var item = itemRepository.findById(id).orElseThrow();
         return ItemRs.builder()
                 .id(item.getId())
                 .name(item.getName())
