@@ -47,3 +47,16 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://primary:5432/my_app_db
       - SPRING_DATASOURCE_USERNAME=aglaya
       - SPRING_DATASOURCE_PASSWORD=aglaya_password
+
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube_local
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ./sonar/data:/opt/sonarqube/data
+      - ./sonar/extensions:/opt/sonarqube/extensions
+      - ./sonar/logs:/opt/sonarqube/logs
