@@ -34,7 +34,6 @@
         <sonar.projectKey>my_app</sonar.projectKey>
         <sonar.projectName>my_app</sonar.projectName>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.token>sqp_abf7baaa2346b0e255cca93244475c16567d617d</sonar.token>
     </properties>
     <dependencies>
         <dependency>
