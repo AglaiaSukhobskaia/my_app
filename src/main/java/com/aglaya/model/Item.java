@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "item")
 @FieldDefaults(level = AccessLevel.PRIVATE)

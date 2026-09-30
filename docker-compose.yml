@@ -19,13 +19,19 @@ services:
       -c max_wal_senders=5
       -c wal_keep_size=1024MB
       -c shared_buffers=256MB
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aglaya -d my_app_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
       
   replica:
     image: postgres:18
     container_name: db_replica
     restart: unless-stopped
     depends_on:
-      - primary
+      primary:
+        condition: service_healthy
     entrypoint: ["/bin/bash", "/tmp/entrypoint.sh"]
     environment:
       - PGDATA=/var/lib/postgresql/18/docker
@@ -40,9 +46,10 @@ services:
     container_name: my_app
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8085:8085"
     depends_on:
-      - primary
+      primary:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://primary:5432/my_app_db
       - SPRING_DATASOURCE_USERNAME=aglaya
