@@ -1,6 +1,5 @@
 package com.aglaya.service;
 
-import com.aglaya.enums.EmailType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,14 +22,15 @@ public class EmailService {
     /**
      * Отправка email-сообщения
      *
-     * @param to        email-адрес получателя
-     * @param emailType тип письма
+     * @param to      email-адрес получателя
+     * @param subject тема письма
+     * @param text    текст письма
      */
-    public void sendEmail(String to, EmailType emailType) {
+    public void sendEmail(String to, String subject, String text) {
         var message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject(emailType.getSubject());
-        message.setText(emailType.getText());
+        message.setSubject(subject);
+        message.setText(text);
         message.setFrom(email);
 
         mailSender.send(message);
