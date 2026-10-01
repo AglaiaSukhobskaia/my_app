@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,13 +24,14 @@ public class AuthService {
 
     JwtService jwtService;
 
-    EmailService emailService;
+    EmailOutboxService emailOutboxService;
 
     /**
      * Регистрация нового пользователя
      *
      * @param request объект запроса на регистрацию нового пользователя
      */
+    @Transactional
     public void register(RegistrationRq request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new RuntimeException("Username already exists");
@@ -47,7 +49,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        emailService.sendEmail(user.getEmail(), EmailType.REGISTER);
+        emailOutboxService.createEmailOutbox(user.getEmail(), EmailType.REGISTER);
     }
 
     /**
