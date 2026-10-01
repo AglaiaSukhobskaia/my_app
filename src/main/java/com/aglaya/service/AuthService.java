@@ -2,6 +2,7 @@ package com.aglaya.service;
 
 import com.aglaya.dto.request.LoginRq;
 import com.aglaya.dto.request.RegistrationRq;
+import com.aglaya.enums.EmailType;
 import com.aglaya.model.User;
 import com.aglaya.repository.UserRepository;
 import com.aglaya.security.JwtService;
@@ -21,6 +22,8 @@ public class AuthService {
     PasswordEncoder passwordEncoder;
 
     JwtService jwtService;
+
+    EmailService emailService;
 
     /**
      * Регистрация нового пользователя
@@ -43,6 +46,8 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        emailService.sendEmail(user.getEmail(), EmailType.REGISTER);
     }
 
     /**
