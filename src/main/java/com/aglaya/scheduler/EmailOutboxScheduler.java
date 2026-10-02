@@ -4,6 +4,7 @@ import com.aglaya.service.EmailOutboxService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,8 @@ public class EmailOutboxScheduler {
      * Отправка всех писем со статусом PENDING каждые 10 секунд
      */
     @Scheduled(fixedDelay = 10000)
-    public void processOutbox() {
+    @SchedulerLock(name = "processPendingEmails", lockAtLeastFor = "10s", lockAtMostFor = "30s")
+    public void processPendingEmails() {
         emailOutboxService.processPendingEmails();
     }
 }

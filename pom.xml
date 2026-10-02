@@ -38,6 +38,7 @@
         <jacoco.version>0.8.15</jacoco.version>
         <sonarqube.version>5.8.0.7211</sonarqube.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <shedlock.version>7.10.1</shedlock.version>
 
         <!-- Настройки для запуска SonarQube -->
         <sonar.projectKey>my_app</sonar.projectKey>
@@ -93,6 +94,18 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!--ShedLock-->
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>${shedlock.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>${shedlock.version}</version>
         </dependency>
 
         <dependency>
