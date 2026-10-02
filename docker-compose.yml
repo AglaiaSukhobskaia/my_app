@@ -55,6 +55,34 @@ services:
       - SPRING_DATASOURCE_USERNAME=aglaya
       - SPRING_DATASOURCE_PASSWORD=aglaya_password
 
+  # Вторая копия приложения
+  my_app_2:
+    build: .
+    container_name: my_app_2
+    restart: unless-stopped
+    ports:
+      - "8086:8085"  # ← Внешний порт 8086, внутренний 8085
+    depends_on:
+      primary:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://primary:5432/my_app_db
+      - SPRING_DATASOURCE_USERNAME=aglaya
+      - SPRING_DATASOURCE_PASSWORD=aglaya_password
+      - APP_INSTANCE_NAME=my_app_2  # ← Другое имя экземпляра
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - my_app
+      - my_app_2
+
   sonarqube:
     image: sonarqube:latest
     container_name: sonarqube_local
