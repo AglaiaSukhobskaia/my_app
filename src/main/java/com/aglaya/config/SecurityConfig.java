@@ -29,14 +29,22 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(
+                                "/auth/**",
+                                "/error")
+                        .permitAll()
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs.yaml"
-                        ).permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                                "/v3/api-docs.yaml")
+                        .permitAll()
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/actuator/metrics/**",
+                                "/actuator/prometheus")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

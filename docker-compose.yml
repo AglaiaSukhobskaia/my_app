@@ -2,7 +2,7 @@ services:
 
   primary:
     image: postgres:18
-    container_name: db_primary
+    container_name: primary
     restart: unless-stopped
     environment:
       - POSTGRES_DB=my_app_db
@@ -27,7 +27,7 @@ services:
       
   replica:
     image: postgres:18
-    container_name: db_replica
+    container_name: replica
     restart: unless-stopped
     depends_on:
       primary:
@@ -41,9 +41,9 @@ services:
       - ./db_data/replica:/var/lib/postgresql
       - ./db_init/entrypoint.sh:/tmp/entrypoint.sh:ro
 
-  my_app:
+  my-app:
     build: .
-    container_name: my_app
+    container_name: my-app
     restart: unless-stopped
     ports:
       - "8085:8085"
@@ -56,9 +56,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=aglaya_password
 
   # Вторая копия приложения
-  my_app_2:
+  my-app-2:
     build: .
-    container_name: my_app_2
+    container_name: my-app-2
     restart: unless-stopped
     ports:
       - "8086:8085"  # ← Внешний порт 8086, внутренний 8085
@@ -69,7 +69,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://primary:5432/my_app_db
       - SPRING_DATASOURCE_USERNAME=aglaya
       - SPRING_DATASOURCE_PASSWORD=aglaya_password
-      - APP_INSTANCE_NAME=my_app_2  # ← Другое имя экземпляра
+      - APP_INSTANCE_NAME=my-app-2  # ← Другое имя экземпляра
 
   nginx:
     image: nginx:alpine
@@ -80,8 +80,8 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - my_app
-      - my_app_2
+      - my-app
+      - my-app-2
 
   sonarqube:
     image: sonarqube:latest
@@ -95,3 +95,23 @@ services:
       - ./sonar/data:/opt/sonarqube/data
       - ./sonar/extensions:/opt/sonarqube/extensions
       - ./sonar/logs:/opt/sonarqube/logs
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
